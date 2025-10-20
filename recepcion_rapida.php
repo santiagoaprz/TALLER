@@ -55,14 +55,15 @@
             <form method="POST" action="guardar_recepcion_rapida.php" id="formRecepcion">
                 
                 <!-- PESTAÑAS -->
-                <div class="tabs">
-                    <button type="button" class="tab active" onclick="openTab('tab-cliente')">1. Cliente</button>
-                    <button type="button" class="tab" onclick="openTab('tab-equipo')">2. Equipo</button>
-                    <button type="button" class="tab" onclick="openTab('tab-estado')">3. Estado Físico</button>
-                    <button type="button" class="tab" onclick="openTab('tab-funcionalidad')">4. Funcionalidad</button>
-                    <button type="button" class="tab" onclick="openTab('tab-accesorios')">5. Accesorios</button>
-                    <button type="button" class="tab" onclick="openTab('tab-orden')">6. Orden</button>
-                </div>
+               <div class="tabs">
+    <button type="button" class="tab active" onclick="openTab('tab-cliente')">1. Cliente</button>
+    <button type="button" class="tab" onclick="openTab('tab-equipo')">2. Equipo</button>
+    <button type="button" class="tab" onclick="openTab('tab-estado')">3. Estado Físico</button>
+    <button type="button" class="tab" onclick="openTab('tab-funcionalidad')">4. Funcionalidad</button>
+    <button type="button" class="tab" onclick="openTab('tab-accesorios')">5. Accesorios</button>
+    <button type="button" class="tab" onclick="openTab('tab-cotizacion')">6. Cotización</button>
+    <button type="button" class="tab" onclick="openTab('tab-orden')">7. Orden</button>
+</div>
 
                 <!-- TAB CLIENTE -->
                 <div id="tab-cliente" class="tab-content active">
@@ -398,10 +399,102 @@
                         <textarea name="orden_observaciones" class="form-control" rows="4" placeholder="Observaciones internas del técnico, prioridad, urgencia..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label>Costo Estimado Inicial</label>
-                        <input type="number" name="orden_costo_estimado" class="form-control" step="0.01" min="0" placeholder="0.00">
-                    </div>
+                    
+
+
+
+
+<!-- SECCIÓN DE COTIZACIÓN INICIAL -->
+<div id="tab-cotizacion" class="tab-content">
+    <div class="section-title">Cotización Inicial de Piezas y Accesorios</div>
+    <p style="color: #666; margin-bottom: 1rem;">Agrega las piezas necesarias para la reparación y accesorios para venta</p>
+
+    <div id="lista-piezas-recepcion" style="margin-bottom: 2rem;">
+        <!-- Las piezas se agregarán aquí dinámicamente -->
+    </div>
+
+    <div class="card" style="background: #f8f9fa;">
+        <h4>Agregar Pieza/Accesorio</h4>
+        <div class="grid-3">
+            <div class="form-group">
+                <label>Tipo</label>
+                <select id="tipo_item_recepcion" class="form-control">
+                    <option value="pieza_reparacion">Pieza para Reparación</option>
+                    <option value="accesorio_venta">Accesorio para Venta</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Nombre *</label>
+                <input type="text" id="nombre_pieza_recepcion" class="form-control" placeholder="Pantalla, Batería, Funda...">
+            </div>
+            
+            <div class="form-group">
+                <label>Precio *</label>
+                <input type="number" id="precio_pieza_recepcion" class="form-control" step="0.01" min="0" placeholder="0.00">
+            </div>
+        </div>
+        
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Cantidad</label>
+                <input type="number" id="cantidad_pieza_recepcion" class="form-control" value="1" min="1">
+            </div>
+            
+            <div class="form-group">
+                <label>Descripción</label>
+                <input type="text" id="descripcion_pieza_recepcion" class="form-control" placeholder="Especificaciones...">
+            </div>
+        </div>
+        
+        <button type="button" class="btn" onclick="agregarPiezaRecepcion()" style="margin-top: 1rem;">
+            + Agregar a Cotización
+        </button>
+    </div>
+
+    <!-- RESUMEN DE COTIZACIÓN -->
+    <div class="card total-cotizacion">
+        <h4>Resumen de Cotización</h4>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Subtotal Piezas:</span>
+            <span id="subtotal-piezas">$0.00</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span>Mano de Obra:</span>
+            <span>
+                <input type="number" name="costo_mano_obra" id="costo_mano_obra" class="form-control" 
+                       style="width: 120px; display: inline-block; margin-left: 10px;" 
+                       step="0.01" min="0" value="0" onchange="calcularTotalRecepcion()">
+            </span>
+        </div>
+        <div style="display: flex; justify-content: space-between; border-top: 1px solid white; padding-top: 0.5rem; font-size: 1.2rem;">
+            <strong>TOTAL COTIZACIÓN:</strong>
+            <strong id="total-cotizacion">$0.00</strong>
+        </div>
+    </div>
+
+    <!-- ANTICIPO -->
+    <div class="form-group">
+        <label>Anticipo del Cliente</label>
+        <input type="number" name="anticipo_recepcion" class="form-control" step="0.01" min="0" 
+               placeholder="0.00" onchange="calcularSaldoPendiente()">
+    </div>
+
+    <div class="form-group">
+        <label>Saldo Pendiente</label>
+        <input type="number" name="saldo_pendiente_recepcion" class="form-control" step="0.01" min="0" 
+               value="0" readonly style="background: #f8f9fa;">
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+        <button type="button" class="btn" onclick="openTab('tab-accesorios')">← Anterior</button>
+        <button type="button" class="btn" onclick="openTab('tab-orden')">Siguiente →</button>
+    </div>
+</div>
+
+
+
+
 
                     <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 2px solid #ecf0f1;">
                         <button type="submit" class="btn btn-large">✅ Guardar Recepción Completa</button>
@@ -568,5 +661,190 @@
         toggleFuncionalidad();
     });
     </script>
+
+
+  
+<script>
+// Mostrar mensajes de éxito/error
+<?php if (isset($_SESSION['success'])): ?>
+    alert('<?php echo $_SESSION['success']; ?>');
+    <?php unset($_SESSION['success']); ?>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['error'])): ?>
+    alert('Error: <?php echo $_SESSION['error']; ?>');
+    <?php unset($_SESSION['error']); ?>
+<?php endif; ?>
+   </script>
+
+<script>
+// Mostrar mensajes de éxito/error - VERSIÓN CORREGIDA
+window.onload = function() {
+    <?php if (isset($_SESSION['success'])): ?>
+        alert('<?php echo str_replace(["\n", "\r"], ['\\n', ''], $_SESSION['success']); ?>');
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+    
+    <?php if (isset($_SESSION['error'])): ?>
+        alert('Error: <?php echo addslashes($_SESSION['error']); ?>');
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+};
+
+
+// Variables para almacenar piezas
+let piezasRecepcion = [];
+
+// Agregar pieza a la lista
+function agregarPiezaRecepcion() {
+    const tipo = document.getElementById('tipo_item_recepcion').value;
+    const nombre = document.getElementById('nombre_pieza_recepcion').value;
+    const precio = parseFloat(document.getElementById('precio_pieza_recepcion').value);
+    const cantidad = parseInt(document.getElementById('cantidad_pieza_recepcion').value);
+    const descripcion = document.getElementById('descripcion_pieza_recepcion').value;
+    
+    if (!nombre || !precio || precio <= 0) {
+        alert('Por favor completa nombre y precio válidos');
+        return;
+    }
+    
+    const pieza = {
+        tipo: tipo,
+        nombre: nombre,
+        precio: precio,
+        cantidad: cantidad,
+        descripcion: descripcion,
+        subtotal: precio * cantidad
+    };
+    
+    piezasRecepcion.push(pieza);
+    actualizarListaPiezasRecepcion();
+    calcularTotalRecepcion();
+    
+    // Limpiar campos
+    document.getElementById('nombre_pieza_recepcion').value = '';
+    document.getElementById('precio_pieza_recepcion').value = '';
+    document.getElementById('descripcion_pieza_recepcion').value = '';
+}
+
+// Actualizar lista de piezas
+function actualizarListaPiezasRecepcion() {
+    const lista = document.getElementById('lista-piezas-recepcion');
+    lista.innerHTML = '';
+    
+    piezasRecepcion.forEach((pieza, index) => {
+        const div = document.createElement('div');
+        div.className = 'pieza-item';
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>${pieza.nombre}</strong>
+                    <br><small>${pieza.descripcion || 'Sin descripción'}</small>
+                    <br><small>Cantidad: ${pieza.cantidad} x $${pieza.precio.toFixed(2)}</small>
+                </div>
+                <div style="text-align: right;">
+                    <strong>$${pieza.subtotal.toFixed(2)}</strong>
+                    <br>
+                    <button type="button" class="btn-small btn-danger" onclick="eliminarPiezaRecepcion(${index})">🗑️</button>
+                </div>
+            </div>
+        `;
+        lista.appendChild(div);
+    });
+}
+
+// Eliminar pieza
+function eliminarPiezaRecepcion(index) {
+    piezasRecepcion.splice(index, 1);
+    actualizarListaPiezasRecepcion();
+    calcularTotalRecepcion();
+}
+
+// Calcular totales
+function calcularTotalRecepcion() {
+    const subtotalPiezas = piezasRecepcion.reduce((sum, pieza) => sum + pieza.subtotal, 0);
+    const manoObra = parseFloat(document.getElementById('costo_mano_obra').value) || 0;
+    const total = subtotalPiezas + manoObra;
+    
+    document.getElementById('subtotal-piezas').textContent = `$${subtotalPiezas.toFixed(2)}`;
+    document.getElementById('total-cotizacion').textContent = `$${total.toFixed(2)}`;
+    
+    calcularSaldoPendiente();
+}
+
+// Calcular saldo pendiente
+function calcularSaldoPendiente() {
+    const total = parseFloat(document.getElementById('total-cotizacion').textContent.replace('$', '')) || 0;
+    const anticipo = parseFloat(document.querySelector('input[name="anticipo_recepcion"]').value) || 0;
+    const saldo = total - anticipo;
+    
+    document.querySelector('input[name="saldo_pendiente_recepcion"]').value = saldo.toFixed(2);
+}
+
+// Actualizar el formulario principal antes de enviar
+// Actualizar el formulario principal antes de enviar
+document.getElementById('formRecepcion').onsubmit = function() {
+    // Agregar campos hidden con las piezas
+    piezasRecepcion.forEach((pieza, index) => {
+        const inputTipo = document.createElement('input');
+        inputTipo.type = 'hidden';
+        inputTipo.name = `piezas[${index}][tipo]`;
+        inputTipo.value = pieza.tipo;
+        this.appendChild(inputTipo);
+        
+        const inputNombre = document.createElement('input');
+        inputNombre.type = 'hidden';
+        inputNombre.name = `piezas[${index}][nombre]`;
+        inputNombre.value = pieza.nombre;
+        this.appendChild(inputNombre);
+        
+        const inputPrecio = document.createElement('input');
+        inputPrecio.type = 'hidden';
+        inputPrecio.name = `piezas[${index}][precio]`;
+        inputPrecio.value = pieza.precio;
+        this.appendChild(inputPrecio);
+        
+        const inputCantidad = document.createElement('input');
+        inputCantidad.type = 'hidden';
+        inputCantidad.name = `piezas[${index}][cantidad]`;
+        inputCantidad.value = pieza.cantidad;
+        this.appendChild(inputCantidad);
+        
+        const inputDescripcion = document.createElement('input');
+        inputDescripcion.type = 'hidden';
+        inputDescripcion.name = `piezas[${index}][descripcion]`;
+        inputDescripcion.value = pieza.descripcion || '';
+        this.appendChild(inputDescripcion);
+    });
+    
+    // Agregar costo total y anticipo como campos hidden
+    const totalInput = document.createElement('input');
+    totalInput.type = 'hidden';
+    totalInput.name = 'costo_total_recepcion';
+    totalInput.value = document.getElementById('total-cotizacion').textContent.replace('$', '');
+    this.appendChild(totalInput);
+    
+    const manoObraInput = document.createElement('input');
+    manoObraInput.type = 'hidden';
+    manoObraInput.name = 'costo_mano_obra';
+    manoObraInput.value = document.getElementById('costo_mano_obra').value;
+    this.appendChild(manoObraInput);
+    
+    const anticipoInput = document.createElement('input');
+    anticipoInput.type = 'hidden';
+    anticipoInput.name = 'anticipo_recepcion_final';
+    anticipoInput.value = document.querySelector('input[name="anticipo_recepcion"]').value;
+    this.appendChild(anticipoInput);
+    
+    // ELIMINAR el campo original de costo_estimado para que no interfiera
+    const costoEstimadoOriginal = document.querySelector('input[name="orden_costo_estimado"]');
+    if (costoEstimadoOriginal) {
+        costoEstimadoOriginal.remove();
+    }
+    
+    return confirm('¿Guardar recepción con ' + piezasRecepcion.length + ' piezas en cotización? Total: ' + document.getElementById('total-cotizacion').textContent);
+};
+</script>
+
 </body>
 </html>

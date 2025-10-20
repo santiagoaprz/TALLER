@@ -292,6 +292,7 @@
         </div>
 
         <!-- LISTA DE EQUIPOS -->
+               <!-- LISTA DE EQUIPOS -->
         <div class="card">
             <h2>Lista de Equipos Registrados</h2>
             
@@ -311,7 +312,8 @@
                 <tbody>
                     <?php
                     $stmt = $pdo->query("
-                        SELECT e.*, c.nombre as cliente 
+                        SELECT e.*, c.nombre as cliente,
+                               (SELECT COUNT(*) FROM ordenes_servicio os WHERE os.id_equipo = e.id_equipo AND os.activa = 1) as tiene_orden_activa
                         FROM equipos e 
                         JOIN clientes c ON e.id_cliente = c.id_cliente 
                         ORDER BY e.fecha_registro DESC
@@ -320,6 +322,14 @@
                         $problema = strlen($equipo['problemas_reportados']) > 50 ? 
                                    substr($equipo['problemas_reportados'], 0, 50) . '...' : 
                                    $equipo['problemas_reportados'];
+                        
+                        // Verificar si ya tiene orden activa
+                        $tiene_orden = $equipo['tiene_orden_activa'] > 0;
+                        
+                        $boton_orden = $tiene_orden 
+                            ? '<span class="btn" style="background: #95a5a6; cursor: not-allowed;" title="Este equipo ya tiene una orden activa">Ya tiene orden</span>'
+                            : '<a href="nueva_orden.php?equipo=' . $equipo['id_equipo'] . '" class="btn btn-info">Crear Orden</a>';
+                        
                         echo "
                         <tr>
                             <td>{$equipo['id_equipo']}</td>
@@ -331,7 +341,7 @@
                             <td>" . date('d/m/Y', strtotime($equipo['fecha_registro'])) . "</td>
                             <td class='actions'>
                                 <a href='equipos.php?editar={$equipo['id_equipo']}' class='btn'>Editar</a>
-                                <a href='nueva_orden.php?equipo={$equipo['id_equipo']}' class='btn btn-info'>Crear Orden</a>
+                                {$boton_orden}
                             </td>
                         </tr>";
                     }

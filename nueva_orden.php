@@ -1,4 +1,23 @@
-<?php include 'config.php'; ?>
+<?php 
+session_start();
+require_once 'conexion.php';
+
+// Verificar si el equipo ya tiene orden activa
+if(isset($_GET['equipo'])) {
+    $equipo_id = $_GET['equipo'];
+    
+    $sql_check = "SELECT COUNT(*) as tiene_orden FROM ordenes_servicio WHERE id_equipo = ? AND activa = 1";
+    $stmt_check = $pdo->prepare($sql_check);
+    $stmt_check->execute([$equipo_id]);
+    $result = $stmt_check->fetch();
+    
+    if($result['tiene_orden'] > 0) {
+        $_SESSION['error'] = "Este equipo ya tiene una orden de servicio activa";
+        header("Location: equipos.php");
+        exit;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -19,8 +38,11 @@
         .form-control { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
         .btn { padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; }
         .btn:hover { background: #219a52; }
+        .btn-cancel { background: #95a5a6; }
+        .btn-cancel:hover { background: #7f8c8d; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         .info-box { background: #e8f4fd; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; }
+        .alert { background: #fff3cd; border: 1px solid #ffeaa7; padding: 1rem; border-radius: 5px; margin-bottom: 1rem; color: #856404; }
     </style>
 </head>
 <body>
@@ -31,6 +53,12 @@
     <?php include 'nav.php'; ?>
 
     <div class="container">
+        <?php if(isset($_SESSION['error'])): ?>
+            <div class="alert">
+                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
+
         <div class="card">
             <h2>Crear Nueva Orden de Servicio</h2>
             
@@ -52,11 +80,15 @@
                 $stmt = $pdo->prepare("SELECT e.*, c.nombre as cliente FROM equipos e JOIN clientes c ON e.id_cliente = c.id_cliente WHERE e.id_equipo = ?");
                 $stmt->execute([$equipo_id]);
                 $equipo_info = $stmt->fetch();
-                $cliente_id = $equipo_info['id_cliente'];
+                if($equipo_info) {
+                    $cliente_id = $equipo_info['id_cliente'];
+                }
             }
             ?>
             
             <form method="POST" action="guardar_orden.php">
+                <input type="hidden" name="id_equipo" value="<?php echo $equipo_id; ?>">
+                
                 <div class="grid-2">
                     <div class="form-group">
                         <label>Cliente *</label>
@@ -118,7 +150,7 @@
                 </div>
 
                 <button type="submit" class="btn">Crear Orden de Servicio</button>
-                <a href="ordenes.php" class="btn" style="background: #95a5a6;">Cancelar</a>
+                <a href="equipos.php" class="btn btn-cancel">Cancelar</a>
             </form>
         </div>
 
@@ -157,6 +189,19 @@
             selectEquipo.innerHTML = '<option value="">Primero seleccione un cliente</option>';
         }
     }
+
+    // Inicializar al cargar la página si ya hay un equipo seleccionado
+    window.onload = function() {
+        <?php if($equipo_info): ?>
+        // Ya hay un equipo seleccionado, no hacer nada
+        <?php else: ?>
+        // Verificar si hay un cliente seleccionado
+        var clienteSelect = document.getElementById('selectCliente');
+        if(clienteSelect.value) {
+            cargarEquipos();
+        }
+        <?php endif; ?>
+    };
     </script>
 </body>
 </html>
